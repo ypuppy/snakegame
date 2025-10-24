@@ -1,0 +1,15 @@
+# Build folders
+bin/
+obj/
+
+# VS Code
+.vscode/
+*.user
+*.suo
+
+# Mac 系统垃圾文件
+.DS_Store
+
+# Rider / Visual Studio 临时文件
+*.userprefs
+
