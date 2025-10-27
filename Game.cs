@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace SnakeGame
@@ -8,11 +10,11 @@ namespace SnakeGame
         private int width, height;
         private Snake snake;
         private Food food;
+        private List<Enemy> enemies = new List<Enemy>();
         private bool gameOver = false;
-        private int frameDelay = 200; // 初始帧延迟
+        private int frameDelay = 200;
         private int score = 0;
-        private Enemy enemy;
-        private bool enemySpawned = false;
+        private int nextEnemyScore = 50; // 下一个敌人生成的分数阈值
 
 
         public Game(int width, int height)
@@ -27,31 +29,34 @@ namespace SnakeGame
         {
             while (!gameOver)
             {
-                // 输入
                 if (Console.KeyAvailable)
                 {
                     ConsoleKey key = Console.ReadKey(true).Key;
                     snake.ChangeDirection(key);
                 }
 
-                // 更新
                 snake.Move();
-
-                // 分数 >= 100 时生成敌人
-                if (!enemySpawned && score >= 10)
-                {
-                    enemy = new Enemy(width, height);
-                    enemySpawned = true;
-                }
-
 
                 // 吃到食物
                 if (snake.Head.X == food.Position.X && snake.Head.Y == food.Position.Y)
                 {
+                    HandleFoodEffect();
                     snake.Grow();
                     food.Respawn(width, height);
-                    score += 10; // 🍏 加分
-                    frameDelay = Math.Max(100, frameDelay - 5);
+                }
+
+                // 每 50 分生成一个敌人
+                if (score >= nextEnemyScore)
+                {
+                    enemies.Add(new Enemy(width, height));
+                    nextEnemyScore += 50; // 下一个敌人要再多 50 分后才生成
+                }
+
+
+                // 更新敌人
+                foreach (var e in enemies)
+                {
+                    e.Move();
                 }
 
                 // 撞墙或自己
@@ -61,29 +66,58 @@ namespace SnakeGame
                 {
                     gameOver = true;
                 }
-                // 如果蛇头碰到敌人 → Game Over
-                if (enemySpawned && snake.Head.X == enemy.Position.X && snake.Head.Y == enemy.Position.Y)
+
+                // 撞到敌人
+                foreach (var e in enemies)
                 {
-                    gameOver = true;
+                    if (snake.Head.X == e.Position.X && snake.Head.Y == e.Position.Y)
+                    {
+                        gameOver = true;
+                        break;
+                    }
                 }
 
-
-                // 绘制
+                // 绘制画面
                 Console.Clear();
                 DrawBorder();
                 DrawHUD();
                 snake.Draw();
                 food.Draw();
-                if (enemySpawned)
-                {
-                    enemy.Move();
-                    enemy.Draw();
-                }
-
+                foreach (var e in enemies) e.Draw();
                 Thread.Sleep(frameDelay);
             }
 
-            // ⚠️ Game Over 动画：闪烁
+            GameOverAnimation();
+        }
+
+        private void HandleFoodEffect()
+        {
+            switch (food.Type)
+            {
+                case FoodType.Normal:
+                    score += 10;
+                    frameDelay = Math.Max(100, frameDelay - 5);
+                    break;
+
+                case FoodType.Attack:
+
+                    if (enemies.Count > 0)
+                    {
+                        Random rand = new Random();
+                        int index = rand.Next(enemies.Count);
+                        enemies.RemoveAt(index);
+                    }
+                    break;
+
+                case FoodType.Freeze:
+                    foreach (var e in enemies)
+                        e.Freeze(2000); // 冻结两秒
+                    break;
+            }
+        }
+
+        private void GameOverAnimation()
+        {
             for (int i = 0; i < 5; i++)
             {
                 Console.Clear();
@@ -92,6 +126,7 @@ namespace SnakeGame
                     DrawBorder();
                     DrawHUD();
                     snake.Draw();
+                    foreach (var e in enemies) e.Draw();
                 }
                 Thread.Sleep(200);
             }
@@ -109,7 +144,7 @@ namespace SnakeGame
             Console.ReadKey(true);
         }
 
-        void DrawBorder()
+        private void DrawBorder()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
             for (int x = 0; x < width; x++)
@@ -130,7 +165,7 @@ namespace SnakeGame
             Console.ResetColor();
         }
 
-        void DrawHUD()
+        private void DrawHUD()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.SetCursorPosition(2, 0);

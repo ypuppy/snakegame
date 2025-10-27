@@ -8,6 +8,8 @@ namespace SnakeGame
         private Random rand = new Random();
         private int width, height;
         private int moveCounter = 0;
+        private bool frozen = false;
+        private DateTime frozenUntil;
 
         public Enemy(int width, int height)
         {
@@ -21,9 +23,18 @@ namespace SnakeGame
             Position = new Point(rand.Next(2, width - 2), rand.Next(2, height - 2));
         }
 
+        public void Freeze(int durationMs)
+        {
+            frozen = true;
+            frozenUntil = DateTime.Now.AddMilliseconds(durationMs);
+        }
+
         public void Move()
         {
-            // 每 5 帧移动一次
+            if (frozen && DateTime.Now < frozenUntil)
+                return;
+            frozen = false;
+
             moveCounter++;
             if (moveCounter % 5 != 0) return;
 
@@ -39,7 +50,6 @@ namespace SnakeGame
                 case 3: newY--; break; // 上
             }
 
-            // 保持在边界内
             if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1)
             {
                 Position = new Point(newX, newY);
@@ -48,7 +58,7 @@ namespace SnakeGame
 
         public void Draw()
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = frozen ? ConsoleColor.Cyan : ConsoleColor.Red;
             Console.SetCursorPosition(Position.X, Position.Y);
             Console.Write("X");
             Console.ResetColor();
