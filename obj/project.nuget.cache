@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sD5kQTYfLHmYNhtxaOgDcCjC7lYCf2zubFYoL+SlpJFExl2+CAztrIwxER5WKkOc67Shu6NErbSMHmRxxc/bog==",
+  "dgSpecHash": "bejFm0M5w8m9LvOVVzzDTCEU0+hNilnV7oYnjZ+t8n/gsRQekdtAHNPdPDMpUUV51rSFTeFZu5y+nTtuWMoi2A==",
   "success": true,
-  "projectFilePath": "/Users/yep/snakegame/snakegame.csproj",
+  "projectFilePath": "/Users/yep/Desktop/snakegame/snakegame.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

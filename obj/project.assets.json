@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/yep/snakegame/snakegame.csproj",
+      "projectUniqueName": "/Users/yep/Desktop/snakegame/snakegame.csproj",
       "projectName": "snakegame",
-      "projectPath": "/Users/yep/snakegame/snakegame.csproj",
+      "projectPath": "/Users/yep/Desktop/snakegame/snakegame.csproj",
       "packagesPath": "/Users/yep/.nuget/packages/",
-      "outputPath": "/Users/yep/snakegame/obj/",
+      "outputPath": "/Users/yep/Desktop/snakegame/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/yep/.nuget/NuGet/NuGet.Config"
