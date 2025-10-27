@@ -11,6 +11,9 @@ namespace SnakeGame
         private bool gameOver = false;
         private int frameDelay = 200; // 初始帧延迟
         private int score = 0;
+        private Enemy enemy;
+        private bool enemySpawned = false;
+
 
         public Game(int width, int height)
         {
@@ -34,6 +37,14 @@ namespace SnakeGame
                 // 更新
                 snake.Move();
 
+                // 分数 >= 100 时生成敌人
+                if (!enemySpawned && score >= 10)
+                {
+                    enemy = new Enemy(width, height);
+                    enemySpawned = true;
+                }
+
+
                 // 吃到食物
                 if (snake.Head.X == food.Position.X && snake.Head.Y == food.Position.Y)
                 {
@@ -50,6 +61,12 @@ namespace SnakeGame
                 {
                     gameOver = true;
                 }
+                // 如果蛇头碰到敌人 → Game Over
+                if (enemySpawned && snake.Head.X == enemy.Position.X && snake.Head.Y == enemy.Position.Y)
+                {
+                    gameOver = true;
+                }
+
 
                 // 绘制
                 Console.Clear();
@@ -57,6 +74,12 @@ namespace SnakeGame
                 DrawHUD();
                 snake.Draw();
                 food.Draw();
+                if (enemySpawned)
+                {
+                    enemy.Move();
+                    enemy.Draw();
+                }
+
                 Thread.Sleep(frameDelay);
             }
 
