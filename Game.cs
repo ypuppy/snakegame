@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.IO;
+
 
 namespace SnakeGame
 {
@@ -12,15 +14,19 @@ namespace SnakeGame
         private Food food;
         private List<Enemy> enemies = new List<Enemy>();
         private bool gameOver = false;
-        private int frameDelay = 200;
+        private int frameDelay;
         private int score = 0;
-        private int nextEnemyScore = 50; // 下一个敌人生成的分数阈值
+        private int nextEnemyScore = 50;
+        private int highScore = 0;
+        private string highScoreFile = "highscore.txt";
+        private bool isNewRecord = false;
 
 
-        public Game(int width, int height)
+        public Game(int width, int height, int initialSpeed = 200)
         {
             this.width = width;
             this.height = height;
+            this.frameDelay = initialSpeed;
             snake = new Snake(width / 2, height / 2);
             food = new Food(width, height);
         }
@@ -118,6 +124,16 @@ namespace SnakeGame
 
         private void GameOverAnimation()
         {
+            bool isNewRecord = false;
+
+            if (score > highScore)
+            {
+                highScore = score;
+                File.WriteAllText(highScoreFile, highScore.ToString());
+                isNewRecord = true;
+            }
+
+
             for (int i = 0; i < 5; i++)
             {
                 Console.Clear();
@@ -139,8 +155,25 @@ namespace SnakeGame
 
             Console.SetCursorPosition(width / 2 - 6, height / 2 + 2);
             Console.Write($"Final Score: {score}");
-            Console.SetCursorPosition(width / 2 - 8, height / 2 + 4);
-            Console.Write("Press any key to exit...");
+
+            // 🎉 Flash "NEW HIGH SCORE!" if applicable
+            if (isNewRecord)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    Console.SetCursorPosition(width / 2 - 8, height / 2 + 4);
+                    Console.ForegroundColor = (i % 2 == 0) ? ConsoleColor.Yellow : ConsoleColor.Magenta;
+                    Console.Write("✨ NEW HIGH SCORE! ✨");
+                    Thread.Sleep(250);
+                }
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.SetCursorPosition(width / 2 - 8, height / 2 + 4);
+                Console.Write("Press any key to exit...");
+            }
+
             Console.ReadKey(true);
         }
 
@@ -165,12 +198,17 @@ namespace SnakeGame
             Console.ResetColor();
         }
 
-        private void DrawHUD()
+        void DrawHUD()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.SetCursorPosition(2, 0);
             Console.Write($"Score: {score}");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.SetCursorPosition(20, 0);
+            Console.Write($"High: {highScore}");
             Console.ResetColor();
         }
+
     }
 }
