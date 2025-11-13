@@ -16,19 +16,46 @@ namespace SnakeGame
         private bool gameOver = false;
         private int frameDelay;
         private int score = 0;
-        private int nextEnemyScore = 50;
+        private int nextEnemyScore;
         private int highScore = 0;
         private string highScoreFile = "highscore.txt";
         private bool isNewRecord = false;
+        private Difficulty difficulty;
+        private DifficultySettings settings;
 
 
-        public Game(int width, int height, int initialSpeed = 200)
+        public Game(int width, int height, int initialSpeed, Difficulty diff)
         {
             this.width = width;
             this.height = height;
             this.frameDelay = initialSpeed;
+            this.difficulty = diff;
             snake = new Snake(width / 2, height / 2);
             food = new Food(width, height);
+
+            settings = diff switch
+            {
+                Difficulty.Easy => new DifficultySettings(80, 15),
+                Difficulty.Normal => new DifficultySettings(50, 10),
+                Difficulty.Hard => new DifficultySettings(40, 7),
+                _ => new DifficultySettings(50, 10)
+            };
+
+            nextEnemyScore = settings.EnemySpawnThreshold;
+
+
+            try
+            {
+                if (File.Exists(highScoreFile))
+                {
+                    string content = File.ReadAllText(highScoreFile);
+                    int.TryParse(content, out highScore);
+                }
+            }
+            catch
+            {
+                highScore = 0;
+            }
         }
 
         public void Run()
@@ -48,15 +75,16 @@ namespace SnakeGame
                 {
                     HandleFoodEffect();
                     snake.Grow();
-                    food.Respawn(width, height);
+                    food.Respawn(width, height, settings.SpecialFoodProbability);
+
                 }
 
-                // 每 50 分生成一个敌人
                 if (score >= nextEnemyScore)
                 {
                     enemies.Add(new Enemy(width, height));
-                    nextEnemyScore += 50; // 下一个敌人要再多 50 分后才生成
+                    nextEnemyScore += settings.EnemySpawnThreshold;
                 }
+
 
 
                 // 更新敌人
@@ -129,8 +157,21 @@ namespace SnakeGame
             if (score > highScore)
             {
                 highScore = score;
-                File.WriteAllText(highScoreFile, highScore.ToString());
+                try
+                {
+                    File.WriteAllText(highScoreFile, highScore.ToString());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"⚠️ Failed to save high score: {e.Message}");
+                }
                 isNewRecord = true;
+                if (OperatingSystem.IsWindows())
+                {
+                    Console.Beep(900, 150);
+                    Console.Beep(1200, 250);
+                }
+
             }
 
 
