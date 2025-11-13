@@ -42,6 +42,20 @@ namespace SnakeGame
             };
 
             nextEnemyScore = settings.EnemySpawnThreshold;
+
+
+            try
+            {
+                if (File.Exists(highScoreFile))
+                {
+                    string content = File.ReadAllText(highScoreFile);
+                    int.TryParse(content, out highScore);
+                }
+            }
+            catch
+            {
+                highScore = 0;
+            }
         }
 
         public void Run()
@@ -143,8 +157,21 @@ namespace SnakeGame
             if (score > highScore)
             {
                 highScore = score;
-                File.WriteAllText(highScoreFile, highScore.ToString());
+                try
+                {
+                    File.WriteAllText(highScoreFile, highScore.ToString());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"⚠️ Failed to save high score: {e.Message}");
+                }
                 isNewRecord = true;
+                if (OperatingSystem.IsWindows())
+                {
+                    Console.Beep(900, 150);
+                    Console.Beep(1200, 250);
+                }
+
             }
 
 
