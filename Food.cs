@@ -16,15 +16,15 @@ namespace SnakeGame
             Respawn(width, height);
         }
 
-        public void Respawn(int width, int height)
+        public void Respawn(int width, int height, int specialChance = 10)
         {
             Position = new Point(rand.Next(2, width - 2), rand.Next(2, height - 2));
 
-            // 10% 概率生成特殊食物
+            // use difficulty-based probability
             int r = rand.Next(100);
-            if (r < 5)
+            if (r < specialChance / 2)
                 Type = FoodType.Attack;
-            else if (r < 10)
+            else if (r < specialChance)
                 Type = FoodType.Freeze;
             else
                 Type = FoodType.Normal;
@@ -36,6 +36,7 @@ namespace SnakeGame
                 _ => (ConsoleColor)rand.Next(1, 15)
             };
         }
+
 
         public void Draw()
         {

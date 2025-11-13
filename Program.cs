@@ -68,11 +68,12 @@ namespace SnakeGame
             Console.WriteLine("  [2] Normal");
             Console.WriteLine("  [3] Hard");
             Console.WriteLine();
-            Console.Write("Enter your choice: ");
+            Console.Write(": ");
 
             int width = 30;
             int height = 20;
             int speed = 200;  // frame delay in ms
+            Difficulty diff = Difficulty.Normal;
 
             ConsoleKey key = Console.ReadKey(true).Key;
             switch (key)
@@ -80,6 +81,7 @@ namespace SnakeGame
                 case ConsoleKey.D1:
                 case ConsoleKey.NumPad1:
                     width = 45; height = 35; speed = 250;
+                    diff = Difficulty.Easy;
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Easy Mode Selected, welcome to the world");
                     break;
@@ -87,6 +89,7 @@ namespace SnakeGame
                 case ConsoleKey.D2:
                 case ConsoleKey.NumPad2:
                     width = 35; height = 25; speed = 200;
+                    diff = Difficulty.Normal;
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Normal Mode Selected,welcome to the world");
                     break;
@@ -94,6 +97,7 @@ namespace SnakeGame
                 case ConsoleKey.D3:
                 case ConsoleKey.NumPad3:
                     width = 30; height = 20; speed = 150;
+                    diff = Difficulty.Hard;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Hard Mode Selected,welcome to the world");
                     break;
@@ -107,7 +111,7 @@ namespace SnakeGame
             Thread.Sleep(800);
 
             Console.Clear();
-            Game game = new Game(width, height, speed);
+            Game game = new Game(width, height, speed, diff);
             game.Run();
         }
 
